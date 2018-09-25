@@ -50,6 +50,12 @@ set @resources='
 		]]>
 	</Value>
   </LocaleResource>  
+  <LocaleResource Name="ShoppingCart.DiscountCouponCode.Activated">
+    <Value>Coupon code ({0}) is activated! The discount will be applied to your order.</Value>
+  </LocaleResource>  
+  <LocaleResource Name="ShoppingCart.DiscountCouponCode.Invalid">
+    <Value>This coupon code ({0}) is invalid or no longer available.</Value>
+  </LocaleResource>
 </Language>
 '
 

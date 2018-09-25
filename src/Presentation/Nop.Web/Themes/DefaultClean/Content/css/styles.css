@@ -478,17 +478,15 @@ label, label + * {
 
 
 
-.bar-notification {
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 1000;
-	width: 100%;
-	padding: 15px 25px 15px 10px;
-	line-height: 16px;
-	color: #fff;
-	opacity: 0.95;
+.bar-notification-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    line-height: 16px;
+    color: #fff;
+    opacity: 0.95;
 }
 .bar-notification.success {
 	background-color: #4bb07a;
@@ -498,6 +496,11 @@ label, label + * {
 }
 .bar-notification.warning {
 	background-color: #f39c12;
+}
+.bar-notification {
+    position: relative;
+    display: none;
+    padding: 15px 25px 15px 10px;
 }
 .bar-notification .content {
 	margin: 0 10px 0 0;

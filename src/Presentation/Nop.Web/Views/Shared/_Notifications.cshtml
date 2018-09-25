@@ -36,7 +36,7 @@
     <script asp-location="Footer">
         $(document).ready(function () {
             var msg = [ @Html.Raw("'" + string.Join("', '", successMessages.Select(x => JavaScriptEncoder.Default.Encode(x)).ToList()) + "'")];
-            displayPopupNotification(msg, 'success', false);
+            displayBarNotification(msg, 'success', false);
         });
     </script>
 }
@@ -45,7 +45,7 @@
     <script asp-location="Footer">
         $(document).ready(function () {
             var msg = [ @Html.Raw("'" + string.Join("', '", errorMessages.Select(x => JavaScriptEncoder.Default.Encode(x)).ToList()) + "'")];
-            displayPopupNotification(msg, 'error', false);
+            displayBarNotification(msg, 'error', false);
         });
     </script>
 }
@@ -54,7 +54,7 @@
     <script asp-location="Footer">
         $(document).ready(function () {
             var msg = [ @Html.Raw("'" + string.Join("', '", warningMessages.Select(x => JavaScriptEncoder.Default.Encode(x)).ToList()) + "'")];
-            displayPopupNotification(msg, 'warning', false);
+            displayBarNotification(msg, 'warning', false);
         });
     </script>
 }
@@ -67,7 +67,6 @@
 </div>
 <div id="dialog-notifications-warning" title="@T("Common.Warning")" style="display:none;">
 </div>
-<div id="bar-notification" class="bar-notification">
-    <span class="close" title="@T("Common.Close")">&nbsp;</span>
+<div id="bar-notification" class="bar-notification-container" data-close="@T("Common.Close")">
 </div>
 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.Notifications })
