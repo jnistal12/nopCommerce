@@ -335,23 +335,27 @@ namespace Nop.Services.Seo
 
             var pathBase = _actionContextAccessor.ActionContext.HttpContext.Request.PathBase;
             //return list of localized urls
-            var localizedUrls = languages.Select(lang => {
-                var currentUrl = urlHelper.RouteUrl(routeName, routeParams?.Invoke(lang.Id), GetHttpProtocol());
+            var localizedUrls = languages
+                .Select(lang =>
+                {
+                    var currentUrl = urlHelper.RouteUrl(routeName, routeParams?.Invoke(lang.Id), GetHttpProtocol());
 
-                if (string.IsNullOrEmpty(currentUrl))
-                    return null;
+                    if (string.IsNullOrEmpty(currentUrl))
+                        return null;
 
-                //Extract server and path from url
-                var scheme = new Uri(currentUrl).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
-                var path = new Uri(currentUrl).PathAndQuery;
+                    //Extract server and path from url
+                    var scheme = new Uri(currentUrl).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                    var path = new Uri(currentUrl).PathAndQuery;
 
-                //Replace seo code
-                var localizedPath = path
-                    .RemoveLanguageSeoCodeFromUrl(pathBase, true)
-                    .AddLanguageSeoCodeToUrl(pathBase, true, lang);
+                    //Replace seo code
+                    var localizedPath = path
+                        .RemoveLanguageSeoCodeFromUrl(pathBase, true)
+                        .AddLanguageSeoCodeToUrl(pathBase, true, lang);
 
-                return new Uri(new Uri(scheme), localizedPath).ToString();
-            }).ToList();
+                    return new Uri(new Uri(scheme), localizedPath).ToString();
+                })
+                .Where(value => !string.IsNullOrEmpty(value))
+                .ToList();
 
             return new SitemapUrl(url, localizedUrls, updateFreq, updatedOn);
         }
@@ -441,6 +445,9 @@ namespace Nop.Services.Seo
             //write all related url
             foreach (var alternate in sitemapUrl.AlternateLocations)
             {
+                if (string.IsNullOrEmpty(alternate))
+                    continue;
+
                 //extract seo code
                 var altLoc = XmlHelper.XmlEncode(alternate);
                 var altLocPath = new Uri(altLoc).PathAndQuery;
