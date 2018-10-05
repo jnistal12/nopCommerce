@@ -462,9 +462,9 @@
 <form asp-controller="Order" asp-action="PdfPackagingSlipSelected" method="post" id="pdf-packaging-slip-selected-form">
     <input type="hidden" id="selectedIds" name="selectedIds" value="" />
 </form>
-<nop-alert asp-alert-id="statesAlert" asp-alert-message="Admin.Common.Alert.States.Failed" />
-<nop-alert asp-alert-id="setAsShippedSelectedFailed" asp-alert-message="" />
-<nop-alert asp-alert-id="setAsDeliveredSelectedFailed" asp-alert-message="" />
+<nop-alert asp-alert-id="statesAlert" asp-alert-message="@T("Admin.Common.Alert.States.Failed")" />
+<nop-alert asp-alert-id="setAsShippedSelectedFailed" />
+<nop-alert asp-alert-id="setAsDeliveredSelectedFailed" />
 
 <script>
                 $(document).ready(function () {

@@ -191,4 +191,4 @@
     </div>
     @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.GiftCardDetailsInfoBottom, additionalData = Model })
 </div>
-<nop-alert asp-alert-id="generateCouponCodeFailed" asp-alert-message="Admin.GiftCards.Fields.GiftCardCouponCode.Alert.FailedGenerate" />
+<nop-alert asp-alert-id="generateCouponCodeFailed" asp-alert-message="@T("Admin.GiftCards.Fields.GiftCardCouponCode.Alert.FailedGenerate")" />

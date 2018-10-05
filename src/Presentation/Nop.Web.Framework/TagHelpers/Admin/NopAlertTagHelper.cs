@@ -12,7 +12,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin
     /// <summary>
     /// nop-alert tag helper
     /// </summary>
-    [HtmlTargetElement("nop-alert", Attributes = AlertNameId + "," + AlertMessageName, TagStructure = TagStructure.WithoutEndTag)]
+    [HtmlTargetElement("nop-alert", Attributes = AlertNameId, TagStructure = TagStructure.WithoutEndTag)]
     public class NopAlertTagHelper : TagHelper
     {
         private const string AlertNameId = "asp-alert-id";

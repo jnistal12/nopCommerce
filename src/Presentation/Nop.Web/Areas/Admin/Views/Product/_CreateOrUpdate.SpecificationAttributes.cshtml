@@ -372,7 +372,7 @@
     }
     @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.ProductDetailsSpecificationAttributesBottom, additionalData = Model })
 </div>
-<nop-alert asp-alert-id="selectOption" asp-alert-message="Admin.Catalog.Products.SpecificationAttributes.Alert.SelectOption" />
-<nop-alert asp-alert-id="noAttributeOptions" asp-alert-message="Admin.Catalog.Products.SpecificationAttributes.Alert.NoAttributeOptions" />
-<nop-alert asp-alert-id="getOptionsByAttributeIdAlert" asp-alert-message="Admin.Catalog.Products.SpecificationAttributes.Alert.FailedRetrieving" />
-<nop-alert asp-alert-id="productSpecificationAttributeAddAlert" asp-alert-message="Admin.Catalog.Products.SpecificationAttributes.Alert.FailedAdd" />
+<nop-alert asp-alert-id="selectOption" asp-alert-message="@T("Admin.Catalog.Products.SpecificationAttributes.Alert.SelectOption")" />
+<nop-alert asp-alert-id="noAttributeOptions" asp-alert-message="@T("Admin.Catalog.Products.SpecificationAttributes.Alert.NoAttributeOptions")" />
+<nop-alert asp-alert-id="getOptionsByAttributeIdAlert" asp-alert-message="@T("Admin.Catalog.Products.SpecificationAttributes.Alert.FailedRetrieving")" />
+<nop-alert asp-alert-id="productSpecificationAttributeAddAlert" asp-alert-message="@T("Admin.Catalog.Products.SpecificationAttributes.Alert.FailedAdd")" />

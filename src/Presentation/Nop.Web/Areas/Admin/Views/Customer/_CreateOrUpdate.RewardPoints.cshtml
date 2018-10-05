@@ -226,5 +226,5 @@
     </div>
     @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.CustomerDetailsRewardPointsBottom, additionalData = Model })
 </div>
-<nop-alert asp-alert-id="rewardPointsHistoryAddAlert" asp-alert-message="Admin.Customers.Customers.RewardPoints.Alert.HistoryAdd" />
-<nop-alert asp-alert-id="rewardPointsHistoryAddFailed" asp-alert-message="" />
+<nop-alert asp-alert-id="rewardPointsHistoryAddAlert" asp-alert-message="@T("Admin.Customers.Customers.RewardPoints.Alert.HistoryAdd")" />
+<nop-alert asp-alert-id="rewardPointsHistoryAddFailed" />

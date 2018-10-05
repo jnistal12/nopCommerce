@@ -199,4 +199,4 @@
     </div>
 </div>
 @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.ProductDetailsProductAttributesCombinationsBottom, additionalData = Model })
-<nop-alert asp-alert-id="generateAllAttributeCombinationsAlert" asp-alert-message="Admin.Catalog.Products.ProductAttributes.AttributeCombinations.Alert.FailedGenerate" />
+<nop-alert asp-alert-id="generateAllAttributeCombinationsAlert" asp-alert-message="@T("Admin.Catalog.Products.ProductAttributes.AttributeCombinations.Alert.FailedGenerate")" />

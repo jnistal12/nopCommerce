@@ -228,7 +228,7 @@
                                                 <span id="@(controlId + "remove")" class="btn btn-default margin-t-5" style="display: none;">@T("Admin.Download.RemoveDownload")</span>
                                             </div>
                                         </div>
-                                        <nop-alert asp-alert-id="uploadFileProductAttributeFailed" asp-alert-message="" />
+                                        <nop-alert asp-alert-id="uploadFileProductAttributeFailed" />
                                     }
                                     break;
                             }
@@ -315,7 +315,7 @@
                     @Html.Raw(attributeChangeScriptsBuilder.ToString())
                 });
             </script>
-            <nop-alert asp-alert-id="productdetails_attributechangeMessage" asp-alert-message="" />
+            <nop-alert asp-alert-id="productdetails_attributechangeMessage" />
         </div>
 
         <script>

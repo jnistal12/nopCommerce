@@ -60,7 +60,7 @@
         });
 </script>
 
-<nop-alert asp-alert-id="saveModeAlert" asp-alert-message="Admin.Common.Alert.Save.Error" />
+<nop-alert asp-alert-id="saveModeAlert" asp-alert-message="@T("Admin.Common.Alert.Save.Error")" />
 
 @await Html.PartialAsync("~/Plugins/Shipping.FixedByWeightByTotal/Views/_FixedRate.cshtml")
 @await Html.PartialAsync("~/Plugins/Shipping.FixedByWeightByTotal/Views/_ByWeightByTotal.cshtml", Model)

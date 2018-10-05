@@ -284,5 +284,5 @@
     }
     @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.DiscountDetailsRequirementsBottom, additionalData = Model })
 </div>
-<nop-alert asp-alert-id="failedToSave" asp-alert-message="Admin.Promotions.Discounts.Requirements.Alert.FailedToSave" />
-<nop-alert asp-alert-id="getDiscountRequirementsAlert" asp-alert-message="Admin.Promotions.Discounts.Requirements.Alert.FailedGetDiscountRequirements" />
+<nop-alert asp-alert-id="failedToSave" asp-alert-message="@T("Admin.Promotions.Discounts.Requirements.Alert.FailedToSave")" />
+<nop-alert asp-alert-id="getDiscountRequirementsAlert" asp-alert-message="@T("Admin.Promotions.Discounts.Requirements.Alert.FailedGetDiscountRequirements")" />
