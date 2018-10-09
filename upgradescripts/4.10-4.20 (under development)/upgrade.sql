@@ -159,3 +159,10 @@ BEGIN
     VALUES (N'adminareasettings.usericheditorforcustomeremails', N'False', 0)
 END
 GO
+
+IF NOT EXISTS (SELECT 1 FROM [Setting] WHERE [Name] = N'messagessettings.usepopupnotifications')
+BEGIN
+    INSERT [Setting] ([Name], [Value], [StoreId])
+    VALUES (N'messagessettings.usepopupnotifications', N'False', 0)
+END
+GO

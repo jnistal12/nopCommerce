@@ -27,41 +27,34 @@ function displayAjaxLoading(display) {
 }
 
 function displayPopupNotification(message, messagetype, modal) {
-    //types: success, error, warning
-    var container;
-    if (messagetype == 'success') {
-        //success
-        container = $('#dialog-notifications-success');
-    }
-    else if (messagetype == 'error') {
-        //error
-        container = $('#dialog-notifications-error');
-    }
-    else if (messagetype == 'warning') {
-        //warning
-        container = $('#dialog-notifications-warning');
-    }
-    else {
-        //other
-        container = $('#dialog-notifications-success');
-    }
 
-    //we do not encode displayed message
-    var htmlcode = '';
-    if ((typeof message) == 'string') {
-        htmlcode = '<p>' + message + '</p>';
-    } else {
-        for (var i = 0; i < message.length; i++) {
-            htmlcode = htmlcode + '<p>' + message[i] + '</p>';
-        }
+    var messages = typeof message === 'string' ? [message] : message;
+    if (messages.length === 0)
+        return;
+
+    //types: success, error, warning
+    messagetype = ['success', 'error', 'warning'].indexOf(messagetype) !== -1 ? messagetype : 'success';
+    var container = $('#dialog-notifications-' + messagetype);
+
+    var htmlcode = document.createElement('div');
+    var breaker = document.createElement('hr');
+
+    htmlcode.append(breaker);
+    for (var i = 0; i < messages.length; i++) {
+        var elem = document.createElement('p');
+        breaker = document.createElement('hr');
+
+        elem.innerHTML = messages[i];
+
+        htmlcode.append(elem);
+        htmlcode.append(breaker);
     }
 
     container.html(htmlcode);
 
-    var isModal = (modal ? true : false);
     container.dialog({
-        modal: isModal,
-        width: 350
+        width: 350,
+        modal: !!modal
     });
 }
 function displayPopupContentFromUrl(url, title, modal, width) {
@@ -84,6 +77,10 @@ function displayPopupContentFromUrl(url, title, modal, width) {
 function displayBarNotification(message, messagetype, timeout) {
     var notificationTimeout;
 
+    var messages = typeof message === 'string' ? [message] : message;
+    if (messages.length === 0)
+        return;
+
     //types: success, error, warning
     var cssclass = ['success', 'error', 'warning'].indexOf(messagetype) !== -1 ? messagetype : 'success';
 
@@ -95,8 +92,6 @@ function displayBarNotification(message, messagetype, timeout) {
     var close = document.createElement('span');
     close.classList.add('close');
     close.setAttribute('title', document.getElementById('bar-notification').dataset.close);
-
-    var messages = typeof message === 'string' ? [ message ] : message;
 
     for (var i = 0; i < messages.length; i++) {
         var content = document.createElement('p');

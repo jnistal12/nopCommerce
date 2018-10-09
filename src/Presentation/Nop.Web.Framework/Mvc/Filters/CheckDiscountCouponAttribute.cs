@@ -99,28 +99,41 @@ namespace Nop.Web.Framework.Mvc.Filters
                 var discounts = couponCodes
                     .SelectMany(couponCode => _discountService.GetAllDiscountsForCaching(couponCode: couponCode))
                     .Distinct()
-                    .Where(discount => _discountService.ValidateDiscount(discount, _workContext.CurrentCustomer, couponCodes.ToArray()).IsValid)
                     .ToList();
 
-                //show notifications for invalid coupon codes
-                couponCodes
-                    .Distinct()
-                    .Where(code => discounts.All(discount => discount.CouponCode != code))
-                    .ToList()
-                    .ForEach(code => _notificationService.WarningNotification(
-                            string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Invalid"), code)));
+                foreach (var discount in discounts)
+                {
+                    var isValid = _discountService
+                        .ValidateDiscount(discount, _workContext.CurrentCustomer, couponCodes.ToArray()).IsValid;
 
-                //apply discount coupon codes to customer
-                discounts
-                    .ForEach(discount => _customerService.ApplyDiscountCouponCode(_workContext.CurrentCustomer, discount.CouponCode));  
+                    if (isValid)
+                    {
+                        //apply discount coupon codes to customer
+                        _customerService.ApplyDiscountCouponCode(_workContext.CurrentCustomer, discount.CouponCode);
 
-                //show notifications for activated coupon codes
-                discounts
-                    .Select(discount => discount.CouponCode)
-                    .Distinct()
-                    .ToList()
-                    .ForEach(code => _notificationService.SuccessNotification(
-                            string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Activated"), code)));
+                        //show notifications for activated coupon codes
+                        _notificationService.SuccessNotification(
+                            string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Activated"),
+                                discount.CouponCode));
+                    }
+                    else
+                    {
+                        //show notifications for invalid coupon codes
+                        _notificationService.WarningNotification(
+                            string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Invalid"),
+                                discount.CouponCode));
+                    }
+                }
+
+                foreach (var invalidCouponCode in couponCodes.Except(
+                    discounts.Select(discount => discount.CouponCode)))
+                {
+                    //show notifications for invalid coupon codes
+                    _notificationService.WarningNotification(
+                        string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Invalid"),
+                            invalidCouponCode));
+                }
+
             }
 
             /// <summary>
