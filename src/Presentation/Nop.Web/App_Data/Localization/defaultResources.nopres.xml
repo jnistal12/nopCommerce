@@ -16905,6 +16905,12 @@
   <LocaleResource Name="Products.PriceRangeFrom">
     <Value>From {0}</Value>
   </LocaleResource>
+  <LocaleResource Name="Products.ProductAttributes.FormattedAttribute">
+    <Value>{0}: {1} {2} {3}</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.ProductAttributes.FormattedAttribute.PriceAdjustment">
+    <Value>[{0}{1}{2}]</Value>
+  </LocaleResource>
   <LocaleResource Name="Products.ProductAttributes.PriceAdjustment">
     <Value>{0} [{1}{2}]</Value>
   </LocaleResource>
