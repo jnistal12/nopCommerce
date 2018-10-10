@@ -60,6 +60,33 @@ namespace Nop.Services.Catalog
 
         #endregion
 
+        #region Utilities
+
+        /// <summary>
+        /// Format product attribute to string
+        /// </summary>
+        /// <param name="productAttribute">Product attribute data</param>
+        /// <param name="htmlEncode">A value indicating whether to encode (HTML) values</param>
+        /// <returns>Formatted product attribute</returns>
+        protected virtual string GetFormattedAttributes(ProductAttribute productAttribute, bool htmlEncode = true)
+        {
+            var formattedAttribute = string.Format(
+                _localizationService.GetResource("Products.ProductAttributes.FormattedAttribute"),
+                productAttribute.Name, productAttribute.Value, productAttribute.PriceAdjustment, productAttribute.Quantity).Trim();
+
+            //encode (if required)
+            if (htmlEncode)
+                formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
+
+            if (string.IsNullOrEmpty(formattedAttribute))
+                return null;
+
+            return formattedAttribute;
+        }
+
+        #endregion
+
+
         #region Methods
 
         /// <summary>
@@ -104,18 +131,16 @@ namespace Nop.Services.Catalog
                     {
                         foreach (var value in _productAttributeParser.ParseValues(attributesXml, attribute.Id))
                         {
-                            var attributeName = string.Empty;
-                            var attributeValue = string.Empty;
-                            var priceAdjustmentStr = string.Empty;
-                            var quantity = string.Empty;
+                            var productAttribute = new ProductAttribute();
 
                             switch (attribute.AttributeControlType)
                             {
                                 case AttributeControlType.MultilineTextbox:
                                 {
                                     //multiline textbox
-                                    attributeName = _localizationService.GetLocalized(attribute.ProductAttribute, a => a.Name, _workContext.WorkingLanguage.Id);
-                                    attributeValue = HtmlHelper.FormatText(value, false, true, false, false, false, false);
+                                    productAttribute.Name = _localizationService.GetLocalized(attribute.ProductAttribute, a => a.Name, _workContext.WorkingLanguage.Id);
+                                    productAttribute.Value = HtmlHelper.FormatText(value, false, true, false, false, false, false);
+
                                     break;
                                 }
                                 case AttributeControlType.FileUpload:
@@ -127,33 +152,24 @@ namespace Nop.Services.Catalog
                                     {
                                         var fileName = $"{download.Filename ?? download.DownloadGuid.ToString()}{download.Extension}";
 
+                                        productAttribute.Name = _localizationService.GetLocalized(attribute.ProductAttribute, a => a.Name, _workContext.WorkingLanguage.Id);
                                         //TODO add a method for getting URL (use routing because it handles all SEO friendly URLs)
-                                        attributeValue = allowHyperlinks ? $"<a href=\"{_webHelper.GetStoreLocation(false)}download/getfileupload/?downloadId={download.DownloadGuid}\" class=\"fileuploadattribute\">{fileName}</a>"
+                                        productAttribute.Value = allowHyperlinks ? $"<a href=\"{_webHelper.GetStoreLocation(false)}download/getfileupload/?downloadId={download.DownloadGuid}\" class=\"fileuploadattribute\">{fileName}</a>"
                                             : fileName;
-
-                                        attributeName = _localizationService.GetLocalized(attribute.ProductAttribute, a => a.Name, _workContext.WorkingLanguage.Id);
-
                                     }
 
                                     break;
                                 }
                                 default:
                                     //other attributes (textbox, datepicker)
-                                    attributeName = _localizationService.GetLocalized(attribute.ProductAttribute,
+                                    productAttribute.Name = _localizationService.GetLocalized(attribute.ProductAttribute,
                                         a => a.Name, _workContext.WorkingLanguage.Id);
-                                    attributeValue = value;
+                                    productAttribute.Value = value;
                                     break;
                             }
 
-                            var formattedAttribute = string.Format(
-                                _localizationService.GetResource("Products.ProductAttributes.FormattedAttribute"),
-                                attributeName, attributeValue, priceAdjustmentStr, quantity);
-
-                            //encode (if required)
-                            if (htmlEncode)
-                                formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
-
-                            if (string.IsNullOrEmpty(formattedAttribute))
+                            var formattedAttribute = GetFormattedAttributes(productAttribute, htmlEncode);
+                            if (formattedAttribute == null)
                                 continue;
 
                             if (result.Length > 0)
@@ -167,12 +183,14 @@ namespace Nop.Services.Catalog
                     {
                         foreach (var value in _productAttributeParser.ParseProductAttributeValues(attributesXml, attribute.Id))
                         {
-                            var attributeName = _localizationService.GetLocalized(attribute.ProductAttribute, a => a.Name,
-                                _workContext.WorkingLanguage.Id);
-                            var attributeValue = _localizationService.GetLocalized(value, a => a.Name,
-                                _workContext.WorkingLanguage.Id);
-                            var priceAdjustmentStr = string.Empty;
-                            var quantity = string.Empty;
+                            var productAttribute = new ProductAttribute
+                            {
+                                Name = _localizationService.GetLocalized(attribute.ProductAttribute,
+                                    a => a.Name,
+                                    _workContext.WorkingLanguage.Id),
+                                Value = _localizationService.GetLocalized(value, a => a.Name,
+                                    _workContext.WorkingLanguage.Id)
+                            };
 
                             if (renderPrices)
                             {
@@ -180,14 +198,14 @@ namespace Nop.Services.Catalog
                                 {
                                     if (value.PriceAdjustment > decimal.Zero)
                                     {
-                                        priceAdjustmentStr = string.Format(
-                                            _localizationService.GetResource("Products.ProductAttributes.FormattedAttribute.PriceAdjustment"),
+                                        productAttribute.PriceAdjustment = string.Format(
+                                            _localizationService.GetResource("FormattedAttribute.PriceAdjustment"),
                                             "+", value.PriceAdjustment.ToString("G29"), "%");
                                     }
                                     else if (value.PriceAdjustment < decimal.Zero)
                                     {
-                                        priceAdjustmentStr = string.Format(
-                                            _localizationService.GetResource("Products.ProductAttributes.FormattedAttribute.PriceAdjustment"),
+                                        productAttribute.PriceAdjustment = string.Format(
+                                            _localizationService.GetResource("FormattedAttribute.PriceAdjustment"),
                                             string.Empty, value.PriceAdjustment.ToString("G29"), "%");
                                     }
                                 }
@@ -198,14 +216,14 @@ namespace Nop.Services.Catalog
                                     var priceAdjustment = _currencyService.ConvertFromPrimaryStoreCurrency(priceAdjustmentBase, _workContext.WorkingCurrency);
                                     if (priceAdjustmentBase > decimal.Zero)
                                     {
-                                        priceAdjustmentStr = string.Format(
-                                            _localizationService.GetResource("Products.ProductAttributes.FormattedAttribute.PriceAdjustment"),
+                                        productAttribute.PriceAdjustment = string.Format(
+                                            _localizationService.GetResource("FormattedAttribute.PriceAdjustment"),
                                             "+", _priceFormatter.FormatPrice(priceAdjustment, false, false), string.Empty);
                                     }
                                     else if (priceAdjustmentBase < decimal.Zero)
                                     {
-                                        priceAdjustmentStr = string.Format(
-                                            _localizationService.GetResource("Products.ProductAttributes.FormattedAttribute.PriceAdjustment"),
+                                        productAttribute.PriceAdjustment = string.Format(
+                                            _localizationService.GetResource("FormattedAttribute.PriceAdjustment"),
                                             "-", _priceFormatter.FormatPrice(-priceAdjustment, false, false), string.Empty);
                                     }
                                 }
@@ -216,26 +234,21 @@ namespace Nop.Services.Catalog
                             {
                                 //render only when more than 1
                                 if (value.Quantity > 1)
-                                    quantity = string.Format(
+                                {
+                                    productAttribute.Quantity = string.Format(
                                         _localizationService.GetResource("ProductAttributes.Quantity"),
                                         value.Quantity);
+
+                                }
                             }
 
-                            var formattedAttribute = string.Format(
-                                _localizationService.GetResource("Products.ProductAttributes.FormattedAttribute"),
-                                attributeName, attributeValue, priceAdjustmentStr, quantity).Trim();
-
-                            //encode (if required)
-                            if (htmlEncode)
-                                formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
-
-                            if (string.IsNullOrEmpty(formattedAttribute))
+                            var formattedAttribute = GetFormattedAttributes(productAttribute, htmlEncode);
+                            if (formattedAttribute == null)
                                 continue;
 
                             if (result.Length > 0)
                                 result.Append(separator);
                             result.Append(formattedAttribute);
-
                         }
                     }
 
@@ -278,6 +291,22 @@ namespace Nop.Services.Catalog
 
             return result.ToString();
         }
+
+        #endregion
+
+        #region Nested classes
+
+        /// <summary>
+        /// Class represents a product attribute
+        /// </summary>
+        protected class ProductAttribute
+        {
+            public string Name { get; set; } = string.Empty;
+            public string Value { get; set; } = string.Empty;
+            public string PriceAdjustment { get; set; } = string.Empty;
+            public string Quantity { get; set; } = string.Empty;
+        }
+        
 
         #endregion
     }

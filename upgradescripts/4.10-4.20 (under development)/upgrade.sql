@@ -59,6 +59,9 @@ set @resources='
   <LocaleResource Name="Products.ProductAttributes.FormattedAttribute.PriceAdjustment">
     <Value>[{0}{1}{2}]</Value>
   </LocaleResource>
+  <LocaleResource Name="ProductAttributes.Quantity">
+    <Value>- quantity {0}</Value>
+  </LocaleResource>
 </Language>
 '
 

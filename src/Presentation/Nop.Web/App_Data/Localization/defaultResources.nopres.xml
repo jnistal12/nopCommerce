@@ -15342,6 +15342,9 @@
   <LocaleResource Name="Footer.TaxShipping.InclTax">
     <Value><![CDATA[All prices are entered including tax. Excluding <a href="{0}">shipping</a>]]></Value>
   </LocaleResource>
+  <LocaleResource Name="FormattedAttribute.PriceAdjustment">
+    <Value>[{0}{1}{2}]</Value>
+  </LocaleResource>
   <LocaleResource Name="Forum.ActiveDiscussions">
     <Value>Active discussions</Value>
   </LocaleResource>
@@ -16693,7 +16696,7 @@
     <Value>You have {0} unread message(s) in your Inbox</Value>
   </LocaleResource>
   <LocaleResource Name="ProductAttributes.Quantity">
-    <Value> - quantity {0}</Value>
+    <Value>- quantity {0}</Value>
   </LocaleResource>
   <LocaleResource Name="Products.AlsoPurchased">
     <Value>Customers who bought this item also bought</Value>
@@ -16907,9 +16910,6 @@
   </LocaleResource>
   <LocaleResource Name="Products.ProductAttributes.FormattedAttribute">
     <Value>{0}: {1} {2} {3}</Value>
-  </LocaleResource>
-  <LocaleResource Name="Products.ProductAttributes.FormattedAttribute.PriceAdjustment">
-    <Value>[{0}{1}{2}]</Value>
   </LocaleResource>
   <LocaleResource Name="Products.ProductAttributes.PriceAdjustment">
     <Value>{0} [{1}{2}]</Value>
