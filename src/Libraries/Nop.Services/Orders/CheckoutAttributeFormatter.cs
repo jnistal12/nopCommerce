@@ -90,76 +90,84 @@ namespace Nop.Services.Orders
             var result = new StringBuilder();
 
             var attributes = _checkoutAttributeParser.ParseCheckoutAttributes(attributesXml);
-            for (var i = 0; i < attributes.Count; i++)
+            for (var attributeId = 0; attributeId < attributes.Count; attributeId++)
             {
-                var attribute = attributes[i];
-                var valuesStr = _checkoutAttributeParser.ParseValues(attributesXml, attribute.Id);
-                for (var j = 0; j < valuesStr.Count; j++)
+                var attribute = attributes[attributeId];
+                var values = _checkoutAttributeParser.ParseValues(attributesXml, attribute.Id);
+                for (var valueId = 0; valueId < values.Count; valueId++)
                 {
-                    var valueStr = valuesStr[j];
-                    var formattedAttribute = string.Empty;
+                    var value = values[valueId];
+                    var checkoutAttribute = new CheckoutAttribute();
                     if (!attribute.ShouldHaveValues())
                     {
-                        //no values
-                        if (attribute.AttributeControlType == AttributeControlType.MultilineTextbox)
+                        switch (attribute.AttributeControlType)
                         {
-                            //multiline textbox
-                            var attributeName = _localizationService.GetLocalized(attribute, a => a.Name, _workContext.WorkingLanguage.Id);
-                            //encode (if required)
-                            if (htmlEncode)
-                                attributeName = WebUtility.HtmlEncode(attributeName);
-                            formattedAttribute = $"{attributeName}: {HtmlHelper.FormatText(valueStr, false, true, false, false, false, false)}";
-                            //we never encode multiline textbox input
-                        }
-                        else if (attribute.AttributeControlType == AttributeControlType.FileUpload)
-                        {
-                            //file upload
-                            Guid.TryParse(valueStr, out var downloadGuid);
-                            var download = _downloadService.GetDownloadByGuid(downloadGuid);
-                            if (download != null)
+                            //no values
+                            case AttributeControlType.MultilineTextbox:
                             {
-                                //TODO add a method for getting URL (use routing because it handles all SEO friendly URLs)
-                                string attributeText;
-                                var fileName = $"{download.Filename ?? download.DownloadGuid.ToString()}{download.Extension}";
-                                //encode (if required)
+                                //multiline textbox
+                                checkoutAttribute.Name = _localizationService.GetLocalized(attribute, a => a.Name, _workContext.WorkingLanguage.Id);
+                                checkoutAttribute.Value = HtmlHelper.FormatText(value, false, true, false, false, false, false);
                                 if (htmlEncode)
-                                    fileName = WebUtility.HtmlEncode(fileName);
-                                if (allowHyperlinks)
+                                    checkoutAttribute.Name = WebUtility.HtmlEncode(checkoutAttribute.Name);
+                                checkoutAttribute.DontEncode = true;
+                                break;
+                            }
+                            case AttributeControlType.FileUpload:
+                            {
+                                //file upload
+                                Guid.TryParse(value, out var downloadGuid);
+                                var download = _downloadService.GetDownloadByGuid(downloadGuid);
+                                if (download != null)
                                 {
-                                    //hyperlinks are allowed
-                                    var downloadLink = $"{_webHelper.GetStoreLocation(false)}download/getfileupload/?downloadId={download.DownloadGuid}";
-                                    attributeText = $"<a href=\"{downloadLink}\" class=\"fileuploadattribute\">{fileName}</a>";
-                                }
-                                else
-                                {
-                                    //hyperlinks aren't allowed
-                                    attributeText = fileName;
+                                    //TODO add a method for getting URL (use routing because it handles all SEO friendly URLs)
+                                    var fileName = $"{download.Filename ?? download.DownloadGuid.ToString()}{download.Extension}";
+                                    //encode (if required)
+                                    if (htmlEncode)
+                                        fileName = WebUtility.HtmlEncode(fileName);
+                                    if (allowHyperlinks)
+                                    {
+                                        //hyperlinks are allowed
+                                        var downloadLink = $"{_webHelper.GetStoreLocation(false)}download/getfileupload/?downloadId={download.DownloadGuid}";
+                                        checkoutAttribute.Value = $"<a href=\"{downloadLink}\" class=\"fileuploadattribute\">{fileName}</a>";
+                                    }
+                                    else
+                                    {
+                                        //hyperlinks aren't allowed
+                                        checkoutAttribute.Value = fileName;
+                                    }
+
+                                    checkoutAttribute.Name = _localizationService.GetLocalized(attribute, a => a.Name, _workContext.WorkingLanguage.Id);
+                                    if (htmlEncode)
+                                        checkoutAttribute.Name = WebUtility.HtmlEncode(checkoutAttribute.Name);
+
+                                    checkoutAttribute.DontEncode = true;
                                 }
 
-                                var attributeName = _localizationService.GetLocalized(attribute, a => a.Name, _workContext.WorkingLanguage.Id);
-                                //encode (if required)
-                                if (htmlEncode)
-                                    attributeName = WebUtility.HtmlEncode(attributeName);
-                                formattedAttribute = $"{attributeName}: {attributeText}";
+                                break;
                             }
-                        }
-                        else
-                        {
-                            //other attributes (textbox, datepicker)
-                            formattedAttribute = $"{_localizationService.GetLocalized(attribute, a => a.Name, _workContext.WorkingLanguage.Id)}: {valueStr}";
-                            //encode (if required)
-                            if (htmlEncode)
-                                formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
+                            default:
+                            {
+                                //other attributes (textbox, datepicker)
+                                checkoutAttribute.Name = _localizationService.GetLocalized(attribute, a => a.Name,
+                                    _workContext.WorkingLanguage.Id);
+                                checkoutAttribute.Value = value;
+                                break;
+                            }
                         }
                     }
                     else
                     {
-                        if (int.TryParse(valueStr, out var attributeValueId))
+                        if (int.TryParse(value, out var attributeValueId))
                         {
                             var attributeValue = _checkoutAttributeService.GetCheckoutAttributeValueById(attributeValueId);
                             if (attributeValue != null)
                             {
-                                formattedAttribute = $"{_localizationService.GetLocalized(attribute, a => a.Name, _workContext.WorkingLanguage.Id)}: {_localizationService.GetLocalized(attributeValue, a => a.Name, _workContext.WorkingLanguage.Id)}";
+                                checkoutAttribute.Name = _localizationService.GetLocalized(attribute, a => a.Name,
+                                    _workContext.WorkingLanguage.Id);
+                                checkoutAttribute.Value = _localizationService.GetLocalized(attributeValue, a => a.Name,
+                                    _workContext.WorkingLanguage.Id);
+
                                 if (renderPrices)
                                 {
                                     var priceAdjustmentBase = _taxService.GetCheckoutAttributePrice(attributeValue, customer);
@@ -167,26 +175,48 @@ namespace Nop.Services.Orders
                                     if (priceAdjustmentBase > 0)
                                     {
                                         var priceAdjustmentStr = _priceFormatter.FormatPrice(priceAdjustment);
-                                        formattedAttribute += $" [+{priceAdjustmentStr}]";
+                                        checkoutAttribute.PriceAdjustment = string.Format(
+                                            _localizationService.GetResource("FormattedAttribute.PriceAdjustment"), 
+                                            "+", priceAdjustmentStr, string.Empty);
                                     }
                                 }
                             }
-                            //encode (if required)
-                            if (htmlEncode)
-                                formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
                         }
                     }
+
+                    var formattedAttribute = string.Format(
+                        _localizationService.GetResource("Checkout.CheckoutAttributes.FormattedAttributes"),
+                        checkoutAttribute.Name, checkoutAttribute.Value, checkoutAttribute.PriceAdjustment).Trim();
+
+                    if (htmlEncode && !checkoutAttribute.DontEncode)
+                        formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
 
                     if (string.IsNullOrEmpty(formattedAttribute)) 
                         continue;
 
-                    if (i != 0 || j != 0)
+                    if (attributeId != 0 || valueId != 0)
                         result.Append(separator);
                     result.Append(formattedAttribute);
                 }
             }
 
             return result.ToString();
+        }
+
+        #endregion
+
+        #region Nested classes
+
+        /// <summary>
+        /// Represents a checkout attribute
+        /// </summary>
+        protected class CheckoutAttribute
+        {
+            public bool DontEncode { get; set; }
+
+            public string Name { get; set; } = string.Empty;
+            public string Value { get; set; } = string.Empty;
+            public string PriceAdjustment { get; set; } = string.Empty;
         }
 
         #endregion

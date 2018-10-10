@@ -71,7 +71,7 @@ namespace Nop.Services.Catalog
         protected virtual string GetFormattedAttributes(ProductAttribute productAttribute, bool htmlEncode = true)
         {
             var formattedAttribute = string.Format(
-                _localizationService.GetResource("Products.ProductAttributes.FormattedAttribute"),
+                _localizationService.GetResource("Products.ProductAttributes.FormattedAttributes"),
                 productAttribute.Name, productAttribute.Value, productAttribute.PriceAdjustment, productAttribute.Quantity).Trim();
 
             //encode (if required)
@@ -85,7 +85,6 @@ namespace Nop.Services.Catalog
         }
 
         #endregion
-
 
         #region Methods
 
@@ -217,13 +216,13 @@ namespace Nop.Services.Catalog
                                     if (priceAdjustmentBase > decimal.Zero)
                                     {
                                         productAttribute.PriceAdjustment = string.Format(
-                                            _localizationService.GetResource("FormattedAttribute.PriceAdjustment"),
+                                            _localizationService.GetResource("FormattedAttributes.PriceAdjustment"),
                                             "+", _priceFormatter.FormatPrice(priceAdjustment, false, false), string.Empty);
                                     }
                                     else if (priceAdjustmentBase < decimal.Zero)
                                     {
                                         productAttribute.PriceAdjustment = string.Format(
-                                            _localizationService.GetResource("FormattedAttribute.PriceAdjustment"),
+                                            _localizationService.GetResource("FormattedAttributes.PriceAdjustment"),
                                             "-", _priceFormatter.FormatPrice(-priceAdjustment, false, false), string.Empty);
                                     }
                                 }

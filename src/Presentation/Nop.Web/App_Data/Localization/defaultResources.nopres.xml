@@ -14388,6 +14388,9 @@
   <LocaleResource Name="Checkout.Button">
     <Value>Checkout</Value>
   </LocaleResource>
+  <LocaleResource Name="Checkout.CheckoutAttributes.FormattedAttributes">
+    <Value>{0}: {1} {2}</Value>
+  </LocaleResource>
   <LocaleResource Name="Checkout.ConfirmButton">
     <Value>Confirm</Value>
   </LocaleResource>
@@ -15342,7 +15345,7 @@
   <LocaleResource Name="Footer.TaxShipping.InclTax">
     <Value><![CDATA[All prices are entered including tax. Excluding <a href="{0}">shipping</a>]]></Value>
   </LocaleResource>
-  <LocaleResource Name="FormattedAttribute.PriceAdjustment">
+  <LocaleResource Name="FormattedAttributes.PriceAdjustment">
     <Value>[{0}{1}{2}]</Value>
   </LocaleResource>
   <LocaleResource Name="Forum.ActiveDiscussions">
@@ -16908,7 +16911,7 @@
   <LocaleResource Name="Products.PriceRangeFrom">
     <Value>From {0}</Value>
   </LocaleResource>
-  <LocaleResource Name="Products.ProductAttributes.FormattedAttribute">
+  <LocaleResource Name="Products.ProductAttributes.FormattedAttributes">
     <Value>{0}: {1} {2} {3}</Value>
   </LocaleResource>
   <LocaleResource Name="Products.ProductAttributes.PriceAdjustment">
