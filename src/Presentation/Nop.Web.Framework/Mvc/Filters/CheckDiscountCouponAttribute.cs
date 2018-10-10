@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
@@ -101,34 +102,32 @@ namespace Nop.Web.Framework.Mvc.Filters
                     .Distinct()
                     .ToList();
 
+                var validCouponCodes = new List<string>();
+
                 foreach (var discount in discounts)
                 {
                     var isValid = _discountService
                         .ValidateDiscount(discount, _workContext.CurrentCustomer, couponCodes.ToArray()).IsValid;
 
-                    if (isValid)
-                    {
-                        //apply discount coupon codes to customer
-                        _customerService.ApplyDiscountCouponCode(_workContext.CurrentCustomer, discount.CouponCode);
-
-                        //show notifications for activated coupon codes
-                        _notificationService.SuccessNotification(
-                            string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Activated"),
-                                discount.CouponCode));
-                    }
-                    else
-                    {
-                        //show notifications for invalid coupon codes
-                        _notificationService.WarningNotification(
-                            string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Invalid"),
-                                discount.CouponCode));
-                    }
+                    if (!isValid) continue;
+                    
+                    //apply discount coupon codes to customer
+                    _customerService.ApplyDiscountCouponCode(_workContext.CurrentCustomer, discount.CouponCode);
+                    validCouponCodes.Add(discount.CouponCode);
                 }
 
-                foreach (var invalidCouponCode in couponCodes.Except(
-                    discounts.Select(discount => discount.CouponCode)))
+                //show notifications for activated coupon codes
+                foreach (var validCouponCode in validCouponCodes.Distinct())
                 {
-                    //show notifications for invalid coupon codes
+                    _notificationService.SuccessNotification(
+                        string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Activated"),
+                            validCouponCode));
+                }
+
+                //show notifications for invalid coupon codes
+                foreach (var invalidCouponCode in couponCodes.Except(
+                    validCouponCodes.Distinct()))
+                {
                     _notificationService.WarningNotification(
                         string.Format(_localizationService.GetResource("ShoppingCart.DiscountCouponCode.Invalid"),
                             invalidCouponCode));

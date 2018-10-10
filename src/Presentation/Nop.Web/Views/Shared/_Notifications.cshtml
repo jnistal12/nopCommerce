@@ -33,7 +33,7 @@
         }
     }
 }
-@if (successMessages.Count + warningMessages.Count + errorMessages.Count > 0)
+@if (successMessages.Any() || warningMessages.Any() || errorMessages.Any())
 {
     if (messagesSettings.UsePopupNotifications)
     {
