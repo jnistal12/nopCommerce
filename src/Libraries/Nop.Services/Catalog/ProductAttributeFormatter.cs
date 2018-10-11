@@ -69,19 +69,24 @@ namespace Nop.Services.Catalog
         /// <param name="htmlEncode">A value indicating whether to encode (HTML) values</param>
         /// <returns>Formatted product attribute</returns>
         protected virtual string GetFormattedAttributes(ProductAttribute productAttribute, bool htmlEncode = true)
-        {
+        {            
+            //encode (if required)
+            if (htmlEncode)
+            {
+                productAttribute.Name = WebUtility.HtmlEncode(productAttribute.Name);
+                productAttribute.PriceAdjustment = WebUtility.HtmlEncode(productAttribute.PriceAdjustment);
+                productAttribute.Quantity = WebUtility.HtmlEncode(productAttribute.Quantity);
+
+                if (!productAttribute.DontEncodeValue)
+                    productAttribute.Value = WebUtility.HtmlEncode(productAttribute.Value);
+
+            }
             var formattedAttribute = string.Format(
                 _localizationService.GetResource("Products.ProductAttributes.FormattedAttributes"),
                 productAttribute.Name, productAttribute.Value, productAttribute.PriceAdjustment, productAttribute.Quantity).Trim();
 
-            //encode (if required)
-            if (htmlEncode)
-                formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
 
-            if (string.IsNullOrEmpty(formattedAttribute))
-                return null;
-
-            return formattedAttribute;
+            return string.IsNullOrEmpty(formattedAttribute) ? null : formattedAttribute;
         }
 
         #endregion
@@ -139,6 +144,9 @@ namespace Nop.Services.Catalog
                                     //multiline textbox
                                     productAttribute.Name = _localizationService.GetLocalized(attribute.ProductAttribute, a => a.Name, _workContext.WorkingLanguage.Id);
                                     productAttribute.Value = HtmlHelper.FormatText(value, false, true, false, false, false, false);
+                                    
+                                    //we never encode multiline textbox input
+                                    productAttribute.DontEncodeValue = true;
 
                                     break;
                                 }
@@ -150,11 +158,14 @@ namespace Nop.Services.Catalog
                                     if (download != null)
                                     {
                                         var fileName = $"{download.Filename ?? download.DownloadGuid.ToString()}{download.Extension}";
+                                        if (htmlEncode)
+                                            fileName = WebUtility.HtmlEncode(fileName);
 
                                         productAttribute.Name = _localizationService.GetLocalized(attribute.ProductAttribute, a => a.Name, _workContext.WorkingLanguage.Id);
                                         //TODO add a method for getting URL (use routing because it handles all SEO friendly URLs)
                                         productAttribute.Value = allowHyperlinks ? $"<a href=\"{_webHelper.GetStoreLocation(false)}download/getfileupload/?downloadId={download.DownloadGuid}\" class=\"fileuploadattribute\">{fileName}</a>"
                                             : fileName;
+                                        productAttribute.DontEncodeValue = true;
                                     }
 
                                     break;
@@ -300,6 +311,8 @@ namespace Nop.Services.Catalog
         /// </summary>
         protected class ProductAttribute
         {
+            public bool DontEncodeValue { get; set; }
+
             public string Name { get; set; } = string.Empty;
             public string Value { get; set; } = string.Empty;
             public string PriceAdjustment { get; set; } = string.Empty;

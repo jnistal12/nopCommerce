@@ -108,9 +108,9 @@ namespace Nop.Services.Orders
                                 //multiline textbox
                                 checkoutAttribute.Name = _localizationService.GetLocalized(attribute, a => a.Name, _workContext.WorkingLanguage.Id);
                                 checkoutAttribute.Value = HtmlHelper.FormatText(value, false, true, false, false, false, false);
-                                if (htmlEncode)
-                                    checkoutAttribute.Name = WebUtility.HtmlEncode(checkoutAttribute.Name);
-                                checkoutAttribute.DontEncode = true;
+                                
+                                //we never encode multiline textbox input
+                                checkoutAttribute.DontEncodeValue = true;
                                 break;
                             }
                             case AttributeControlType.FileUpload:
@@ -138,10 +138,7 @@ namespace Nop.Services.Orders
                                     }
 
                                     checkoutAttribute.Name = _localizationService.GetLocalized(attribute, a => a.Name, _workContext.WorkingLanguage.Id);
-                                    if (htmlEncode)
-                                        checkoutAttribute.Name = WebUtility.HtmlEncode(checkoutAttribute.Name);
-
-                                    checkoutAttribute.DontEncode = true;
+                                    checkoutAttribute.DontEncodeValue = true;
                                 }
 
                                 break;
@@ -184,12 +181,18 @@ namespace Nop.Services.Orders
                         }
                     }
 
+                    if (htmlEncode)
+                    {
+                        checkoutAttribute.Name = WebUtility.HtmlEncode(checkoutAttribute.Name);
+                        checkoutAttribute.PriceAdjustment = WebUtility.HtmlEncode(checkoutAttribute.PriceAdjustment);
+
+                        if (!checkoutAttribute.DontEncodeValue)
+                            checkoutAttribute.Value = WebUtility.HtmlEncode(checkoutAttribute.Value);
+                    }
+
                     var formattedAttribute = string.Format(
                         _localizationService.GetResource("Checkout.CheckoutAttributes.FormattedAttributes"),
                         checkoutAttribute.Name, checkoutAttribute.Value, checkoutAttribute.PriceAdjustment).Trim();
-
-                    if (htmlEncode && !checkoutAttribute.DontEncode)
-                        formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
 
                     if (string.IsNullOrEmpty(formattedAttribute)) 
                         continue;
@@ -212,7 +215,7 @@ namespace Nop.Services.Orders
         /// </summary>
         protected class CheckoutAttribute
         {
-            public bool DontEncode { get; set; }
+            public bool DontEncodeValue { get; set; }
 
             public string Name { get; set; } = string.Empty;
             public string Value { get; set; } = string.Empty;
